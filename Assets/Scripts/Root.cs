@@ -70,7 +70,6 @@ public class Root : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        PlayerManager.GetInstance().Die();
     }
 
 }

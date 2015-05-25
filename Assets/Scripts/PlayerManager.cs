@@ -52,17 +52,19 @@ public class PlayerManager
                 );
         }
     }
+
     #endregion
 
 
 
 
     # region Called by Network
-    public void AddPlayer(int type, int id, string name, float size, Vector3 pos, Color color)
+    public void AddPlayer(bool isOwn, int id, string name, float size,  Color color, Vector3 pos, Vector3 towards)
     {
         PlayerUnit pu = GameManager.PlayerPoolScript.Get();
         pu.Player.transform.position = pos;
         pu.Script.Size = size;
+        pu.Script.Towards = towards;
 
         SpriteRenderer sp = pu.Player.GetComponent<SpriteRenderer>();
         sp.color = color;
@@ -70,51 +72,30 @@ public class PlayerManager
         float scale = size / sp.sprite.bounds.size.x;
         pu.Player.transform.localScale = new Vector3(scale, scale, 1);
         
-        if (type == 1)
+        if (isOwn)
         {
             pu.Player.tag = "MyPlayerMain";
             myPlayers.Add(id, pu);
         }
-        else if(type == 2)
+        else
         {
             pu.Player.tag = "OtherPlayer";
             otherPlayers.Add(id, pu);
         }
-        else
-        {
-            throw new System.Exception("AddPlayer unknown type: " + type);
-        }
     }
 
 
-    public void Report()
+    public void Update(int id, float size, Vector3 pos, Vector3 towards)
     {
-        foreach(KeyValuePair<int, PlayerUnit>pair in myPlayers)
-        {
-            ProtocolHandler.GetInstance().PlayerUpdate(
-                pair.Key,
-                pair.Value.Script.Size,
-                pair.Value.Player.transform.position,
-                pair.Value.Script.Towards
-                );
-        }
-    }
-
-    public void Update(int id, float size, Vector3 currentPos, Vector3 targetPos)
-    {
-        otherPlayers[id].Player.transform.position = currentPos;
-        otherPlayers[id].Script.SetTarget(targetPos);
+        // only update others
+        otherPlayers[id].Player.transform.position = pos;
+        otherPlayers[id].Script.Towards = towards;
         otherPlayers[id].Script.Size = size;
+
     }
     # endregion
 
-    public void Die()
-    {
-        foreach(KeyValuePair<int, PlayerUnit>pair in myPlayers)
-        {
-            ProtocolHandler.GetInstance().Die(pair.Key);
-        }
-    }
+
 
     public void Die(int id)
     {
@@ -123,8 +104,21 @@ public class PlayerManager
             return;
         }
 
-        PlayerUnit pu = otherPlayers[id];
-        otherPlayers.Remove(id);
+        PlayerUnit pu;
+        if (otherPlayers.ContainsKey(id))
+        {
+            pu = otherPlayers[id];
+            otherPlayers.Remove(id);
+        }
+        else if(myPlayers.ContainsKey(id))
+        {
+            pu = myPlayers[id];
+            myPlayers.Remove(id);
+        }
+        else
+        {
+            return;
+        }
 
         GameManager.PlayerPoolScript.Put(pu);
     }

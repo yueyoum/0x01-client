@@ -13,14 +13,16 @@ namespace Protocol
                     return new Client.GameStart();
                 case "Init":
                     return new Client.PlayerInit();
-                case "GetStatus":
-                    return new Server.PlayerGetStatus();
+                case "Eat":
+                    return new Client.PlayerEat();
+                case "Add":
+                    return new Server.PlayerAdd();
                 case "End":
                     return new Server.GameEnd();
                 case "Update":
                     return new Both.PlayerUpdate();
                 case "Die":
-                    return new Both.PlayerDie();
+                    return new Server.PlayerDie();
                 default:
                     return null;
             }
@@ -32,19 +34,53 @@ namespace Protocol
         string Cmd { get; set; }
     }
 
-    public abstract class AbstractPlayer
+    public abstract class AbstractPlayerBase
     {
         public int Id { get; set; }
-        public string Name { get; set; }
         public float Size { get; set; }
-        public float[] Color { get; set; }
         public float[] Pos { get; set; }
         public float[] Towards { get; set; }
     }
 
+    public abstract class AbstractPlayerFull : AbstractPlayerBase
+    {
+        public string Name { get; set; }
+        public float[] Color { get; set; }
+    }
+
+
     namespace Both
     {
         //Both Server to Client, and Client to Server
+        public class PlayerUpdate: AbstractPlayerBase, IProtocol
+        {
+            private string cmd = "Update";
+            public string Cmd
+            {
+                get { return cmd; }
+                set { cmd = value; }
+            }
+        }
+    }
+
+
+    namespace Server
+    {
+        // Server to Client
+
+        public class PlayerAdd : AbstractPlayerFull, IProtocol
+        {
+            private string cmd = "Add";
+            public string Cmd
+            {
+                get { return cmd; }
+                set { cmd = value; }
+            }
+
+            public bool IsOwn { get; set; }
+        }
+
+
         public class PlayerDie : IProtocol
         {
             private string cmd = "Die";
@@ -57,34 +93,6 @@ namespace Protocol
             public int Id { get; set; }
         }
 
-        public class PlayerUpdate: AbstractPlayer, IProtocol
-        {
-            private string cmd = "Update";
-            public string Cmd
-            {
-                get { return cmd; }
-                set { cmd = value; }
-            }
-
-            public bool IsOwn { get; set; }
-        }
-    }
-
-
-
-    namespace Server
-    {
-        // Server to Client
-
-        public class PlayerGetStatus : IProtocol
-        {
-            private string cmd = "GetStatus";
-            public string Cmd
-            {
-                get { return cmd; }
-                set { cmd = value; }
-            }
-        }
 
         public class GameEnd : IProtocol
         {
@@ -112,7 +120,7 @@ namespace Protocol
         }
 
 
-        public class PlayerInit : AbstractPlayer, IProtocol
+        public class PlayerInit : AbstractPlayerFull, IProtocol
         {
             private string cmd = "Init";
             public string Cmd
@@ -120,6 +128,18 @@ namespace Protocol
                 get { return cmd; }
                 set { cmd = value; }
             }
+        }
+
+        public class PlayerEat : AbstractPlayerBase, IProtocol
+        {
+            private string cmd = "Eat";
+            public string Cmd
+            {
+                get { return cmd; }
+                set { cmd = value; }
+            }
+
+            public int TId { get; set; }
         }
     }
 }

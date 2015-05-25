@@ -52,9 +52,8 @@ public class ProtocolHandler
     {
         Protocol.Client.GameStart p = new Protocol.Client.GameStart();
         string data = JsonConvert.SerializeObject(p);
-        //Transport.GetInstance().Send(data);
+        Transport.GetInstance().Send(data);
         Debug.Log("StartGame");
-        Debug.Log(data);
         PlayerInit();
     }
 
@@ -70,57 +69,67 @@ public class ProtocolHandler
 
         Protocol.Client.PlayerInit p = new Protocol.Client.PlayerInit
         {
+            Id = 0,
             Name = "",
             Size = PlayerManager.InitSize,
             Color = new float[] { Random.Range(0.6f, 0.95f), Random.Range(0.6f, 0.95f), Random.Range(0.6f, 0.95f) },
-            Pos = new float[] { point.x, point.y }
+            Pos = new float[] { point.x, point.y },
+            Towards = new float[] { 0f, 0f }
         };
 
         string data = JsonConvert.SerializeObject(p);
-        Debug.Log(data);
-        //Transport.GetInstance().Send(data);
+        //Debug.Log(data);
+        Transport.GetInstance().Send(data);
     }
 
 
-    public void PlayerUpdate(int id, float size, Vector3 currentPos, Vector3 towards)
+    public void PlayerUpdate(int id, float size, Vector3 pos, Vector3 towards)
     {
-        Protocol.Both.PlayerUpdate p = new Protocol.Both.PlayerUpdate()
+        Protocol.Both.PlayerUpdate p = new Protocol.Both.PlayerUpdate
         {
             Id = id,
             Size = size,
-            Pos = new float[] { currentPos.x, currentPos.y, currentPos.z },
-            Towards = new float[] { towards.x, towards.y, towards.z }
+            Pos = new float[] { pos.x, pos.y },
+            Towards = new float[] { towards.x, towards.y }
         };
 
         string data = JsonConvert.SerializeObject(p);
         Transport.GetInstance().Send(data);
     }
 
-
-    public void Die(int id)
+    public void PlayerEat(int id, float size, Vector3 pos, Vector3 towards, int targetId)
     {
-        Protocol.Both.PlayerDie p = new Protocol.Both.PlayerDie()
+        Protocol.Client.PlayerEat p = new Protocol.Client.PlayerEat
         {
             Id = id,
+            Size = size,
+            Pos = new float[] {pos.x, pos.y},
+            Towards = new float[] {towards.x, towards.y},
+            TId = targetId
         };
 
         string data = JsonConvert.SerializeObject(p);
         Transport.GetInstance().Send(data);
     }
+
+
 
     public void Process(string data)
     {
         Protocol.IProtocol obj = JsonConvert.DeserializeObject<Protocol.IProtocol>(data, new ProtocolConverter());
         switch (obj.Cmd)
         {
-            case "GetStatus":
-                Process((Protocol.Server.PlayerGetStatus)obj);
+            case "Add":
+                Process((Protocol.Server.PlayerAdd)obj);
                 break;
             case "Update":
                 Process((Protocol.Both.PlayerUpdate)obj);
                 break;
             case "Die":
-                Process((Protocol.Both.PlayerDie)obj);
+                Process((Protocol.Server.PlayerDie)obj);
+                break;
+            case "End":
+                Process((Protocol.Server.GameEnd)obj);
                 break;
             default:
                 throw new System.Exception("Bad Cmd: " + obj.Cmd);
@@ -128,35 +137,39 @@ public class ProtocolHandler
     }
 
 
-    //private void Process(Protocol.Server.PlayerAdd data)
-    //{
-    //    PlayerManager.GetInstance().AddPlayer(
-    //        data.Type,
-    //        data.Id,
-    //        data.Name,
-    //        data.Size,
-    //        new Vector3(data.Pos[0], data.Pos[1]),
-    //        new Color(data.Color[0], data.Color[1], data.Color[2])
-    //        );
-    //}
-
-    private void Process(Protocol.Server.PlayerGetStatus data)
+    private void Process(Protocol.Server.PlayerAdd data)
     {
-
+        PlayerManager.GetInstance().AddPlayer(
+            data.IsOwn,
+            data.Id,
+            data.Name,
+            data.Size,
+            new Color(data.Color[0], data.Color[1], data.Color[2]),
+            new Vector3(data.Pos[0], data.Pos[1], 0),
+            new Vector3(data.Towards[0], data.Towards[1], 0)
+            );
     }
+
+
 
     private void Process(Protocol.Both.PlayerUpdate data)
     {
         PlayerManager.GetInstance().Update(
             data.Id,
             data.Size,
-            new Vector3(data.Pos[0], data.Pos[1], data.Pos[2]),
-            new Vector3(data.Towards[0], data.Towards[1], data.Towards[2])
+            new Vector3(data.Pos[0], data.Pos[1], 0),
+            new Vector3(data.Towards[0], data.Towards[1], 0)
             );
     }
 
 
-    private void Process(Protocol.Both.PlayerDie data)
+    private void Process(Protocol.Server.PlayerDie data)
+    {
+        PlayerManager.GetInstance().Die(data.Id);
+
+    }
+
+    private void Process(Protocol.Server.GameEnd data)
     {
 
     }

@@ -13,6 +13,7 @@ public class PlayerScript : MonoBehaviour
 {
     public Vector3 Towards { get; set; }
     public float Size { get; set; }
+    public string Name { get; set; }
     private PlayerStatus Status { get; set; }
 
     // Use this for initialization
