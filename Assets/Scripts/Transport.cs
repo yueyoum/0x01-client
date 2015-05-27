@@ -3,7 +3,6 @@ using System.Collections;
 using System.Text;
 
 using BestHTTP.WebSocket;
-using Newtonsoft.Json;
 
 public class Transport
 {
@@ -37,7 +36,6 @@ public class Transport
     public void Connect()
     {
         webSocket.Open();
-        ProtocolHandler.GetInstance().StartGame();
     }
 
     public void Send(string text)
@@ -55,20 +53,56 @@ public class Transport
     private void OnOpen(WebSocket ws)
     {
         Debug.Log("WS OPEN");
-        ProtocolHandler.GetInstance().StartGame();
+
+        // add self to map
+        Vector2 point;
+        if (!MapManager.GetInstance().FindEmptyArea(out point))
+        {
+            throw new System.Exception("No Empty Area...");
+        }
+
+        Vector2 moveVector = new Vector2(0, 0);
+        int color = Utils.ColorToInt(Utils.RandomColor());
+
+        var unit = new Protocol.Define.Unit();
+        unit.id = System.Guid.NewGuid().ToString();
+        unit.pos.Add(point.x);
+        unit.pos.Add(point.y);
+
+        unit.move_vector.Add(moveVector.x);
+        unit.move_vector.Add(moveVector.y);
+
+        unit.name = "";
+        unit.size = PlayerManager.InitSize;
+        unit.color = color;
+
+
+        PlayerManager.GetInstance().UnitAdd(
+            true,
+            unit.id,
+            unit.name,
+            unit.size,
+            color,
+            point,
+            moveVector
+            );
+
+        var msg = new Protocol.Define.UnitAdd();
+        msg.units.Add(unit);
+
+        var data = Protocol.ProtocolHandler.PackWithId(msg);
+        Send(data);
+
     }
 
     private void OnMessage(WebSocket ws, string message)
     {
         Debug.Log("WS OnMessage: " + message);
-        ProtocolHandler.GetInstance().Process(message);
     }
 
     private void OnBinary(WebSocket ws, byte[] message)
     {
-        string text = Encoding.UTF8.GetString(message);
-        Debug.Log("WS OnBinary: " + text);
-        ProtocolHandler.GetInstance().Process(text);
+        Protocol.ProtocolHandler.Process(message);
     }
 
     private void OnClose(WebSocket ws, System.UInt16 code, string reason)

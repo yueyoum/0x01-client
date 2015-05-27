@@ -4,7 +4,7 @@ using System.Collections;
 public class Timer : MonoBehaviour
 {
 
-    private static readonly float interval = 1f;
+    private static readonly float interval = 2f;
     private float passedTime;
 
     // Use this for initialization
@@ -21,6 +21,7 @@ public class Timer : MonoBehaviour
         {
             //System.DateTime now = System.DateTime.Now;
             //Debug.Log("INTERVAL..." + now.ToString("yyyy-MM-dd HH:mm:ss"));
+            //PlayerManager.GetInstance().Update();
             passedTime = 0;
         }
     }

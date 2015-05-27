@@ -2,24 +2,16 @@
 using System.Collections;
 
 
-public enum PlayerStatus
-{
-    STOP,
-    RUNNING,
-}
-
 
 public class PlayerScript : MonoBehaviour
 {
     public Vector3 Towards { get; set; }
     public float Size { get; set; }
     public string Name { get; set; }
-    private PlayerStatus Status { get; set; }
 
     // Use this for initialization
     void Start()
     {
-        Status = PlayerStatus.STOP;
         if (gameObject.tag == "MyPlayerMain")
         {
             CameraManager.GetInstance().MoveMainCamera(gameObject.transform.position);
@@ -29,10 +21,7 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Status == PlayerStatus.RUNNING)
-        {
-            gameObject.transform.position += Towards * Time.deltaTime * 16;
-        }
+        gameObject.transform.position += Towards * Time.deltaTime * 12;
 
         if (gameObject.tag == "MyPlayerMain")
         {
@@ -51,12 +40,10 @@ public class PlayerScript : MonoBehaviour
         Vector3 towards = targetPosition - gameObject.transform.position;
         towards.Normalize();
         Towards = towards;
-
-        Status = PlayerStatus.RUNNING;
     }
 
     public void Stop()
     {
-        Status = PlayerStatus.STOP;
+        Towards = new Vector3(0, 0, 0);
     }
 }

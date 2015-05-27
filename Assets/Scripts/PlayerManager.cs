@@ -19,8 +19,11 @@ public class PlayerManager
     public static float InitSize { get; set; }
     public static float MaxSize { get; set; }
 
-    private Dictionary<int, PlayerUnit> myPlayers = new Dictionary<int, PlayerUnit>();
-    private Dictionary<int, PlayerUnit> otherPlayers = new Dictionary<int,PlayerUnit>();
+    public delegate void OnUnitUpdateHandler(string id, PlayerUnit pu);
+    public static event OnUnitUpdateHandler OnUnitUpdate = null;
+
+    private Dictionary<string, PlayerUnit> myPlayers = new Dictionary<string, PlayerUnit>();
+    private Dictionary<string, PlayerUnit> otherPlayers = new Dictionary<string,PlayerUnit>();
 
     private static PlayerManager instance = null;
     private PlayerManager()
@@ -41,15 +44,24 @@ public class PlayerManager
     #region Called by Client itself
     public void Move(Vector3 target)
     {
-        foreach (KeyValuePair<int, PlayerUnit> pair in myPlayers)
+        foreach (KeyValuePair<string, PlayerUnit> pair in myPlayers)
         {
             pair.Value.Script.SetTarget(target);
-            ProtocolHandler.GetInstance().PlayerUpdate(
-                pair.Key,
-                pair.Value.Script.Size,
-                pair.Value.Player.transform.position,
-                pair.Value.Script.Towards
-                );
+            if (OnUnitUpdate != null)
+            {
+                OnUnitUpdate(pair.Key, pair.Value);
+            }
+        }
+    }
+
+    public void Update()
+    {
+        foreach (KeyValuePair<string, PlayerUnit> pair in myPlayers)
+        {
+            if (OnUnitUpdate != null)
+            {
+                OnUnitUpdate(pair.Key, pair.Value);
+            }
         }
     }
 
@@ -59,15 +71,15 @@ public class PlayerManager
 
 
     # region Called by Network
-    public void AddPlayer(bool isOwn, int id, string name, float size,  Color color, Vector3 pos, Vector3 towards)
+    public void UnitAdd(bool isOwn, string id, string name, float size,  int color, Vector2 pos, Vector2 moveVector)
     {
         PlayerUnit pu = GameManager.PlayerPoolScript.Get();
         pu.Player.transform.position = pos;
         pu.Script.Size = size;
-        pu.Script.Towards = towards;
+        pu.Script.Towards = moveVector;
 
         SpriteRenderer sp = pu.Player.GetComponent<SpriteRenderer>();
-        sp.color = color;
+        sp.color = Utils.IntToColor(color);
 
         float scale = size / sp.sprite.bounds.size.x;
         pu.Player.transform.localScale = new Vector3(scale, scale, 1);
@@ -85,24 +97,20 @@ public class PlayerManager
     }
 
 
-    public void Update(int id, float size, Vector3 pos, Vector3 towards)
+    public void UnitUpdate(string id, float size, Vector2 pos, Vector2 moveVector)
     {
         // only update others
-        otherPlayers[id].Player.transform.position = pos;
-        otherPlayers[id].Script.Towards = towards;
-        otherPlayers[id].Script.Size = size;
-
-    }
-    # endregion
-
-
-
-    public void Die(int id)
-    {
-        if (!otherPlayers.ContainsKey(id))
+        if (otherPlayers.ContainsKey(id))
         {
-            return;
+            otherPlayers[id].Player.transform.position = pos;
+            otherPlayers[id].Script.Towards = moveVector;
+            otherPlayers[id].Script.Size = size;
         }
+    }
+
+
+    public void UnitRemove(string id)
+    {
 
         PlayerUnit pu;
         if (otherPlayers.ContainsKey(id))
@@ -122,5 +130,7 @@ public class PlayerManager
 
         GameManager.PlayerPoolScript.Put(pu);
     }
+    # endregion
+
 }
 

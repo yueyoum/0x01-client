@@ -17,6 +17,8 @@ public class Root : MonoBehaviour
     {
         GameManager.RootScript = this;
 
+        EventManger.GetInstance();
+
         CameraManager.CameraMain = Camera.main;
         CameraManager.MaxSize = 40;
         CameraManager.MinSize = 10;
@@ -33,9 +35,8 @@ public class Root : MonoBehaviour
         PlayerManager.MaxSize = 20f;
         PlayerManager.GetInstance();
 
-        ProtocolHandler.GetInstance();
 
-        Transport.uri = "ws://192.168.1.109:8081/ws/";
+        Transport.uri = "ws://192.168.1.109:9001/ws/";
         Transport.GetInstance().Connect();
 
     }
