@@ -21,7 +21,7 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        gameObject.transform.position += Towards * Time.deltaTime * 12;
+        gameObject.transform.position += Towards * Time.deltaTime * 10;
 
         if (gameObject.tag == "MyPlayerMain")
         {

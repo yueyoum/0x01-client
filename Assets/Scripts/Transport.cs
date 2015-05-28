@@ -54,6 +54,16 @@ public class Transport
     {
         Debug.Log("WS OPEN");
 
+        // time sync
+        var timemsg = new Protocol.Define.TimeSync();
+        timemsg.client = TimeManager.GetInstance().TimestampInMilliSeconds;
+        timemsg.server = 0;
+
+        Send(Protocol.ProtocolHandler.PackWithId(timemsg));
+
+
+
+
         // add self to map
         Vector2 point;
         if (!MapManager.GetInstance().FindEmptyArea(out point))

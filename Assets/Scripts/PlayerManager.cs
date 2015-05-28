@@ -97,14 +97,22 @@ public class PlayerManager
     }
 
 
-    public void UnitUpdate(string id, float size, Vector2 pos, Vector2 moveVector)
+    public void UnitUpdate(string id, float size, Vector2 pos, Vector2 moveVector, float timeSpan)
     {
+        pos += moveVector * timeSpan * 10;
         // only update others
         if (otherPlayers.ContainsKey(id))
         {
             otherPlayers[id].Player.transform.position = pos;
             otherPlayers[id].Script.Towards = moveVector;
             otherPlayers[id].Script.Size = size;
+        }
+        else
+        {
+            myPlayers[id].Player.transform.position = pos;
+            myPlayers[id].Script.Towards = moveVector;
+            myPlayers[id].Script.Size = size;
+
         }
     }
 

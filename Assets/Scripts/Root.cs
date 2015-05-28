@@ -35,9 +35,11 @@ public class Root : MonoBehaviour
         PlayerManager.MaxSize = 20f;
         PlayerManager.GetInstance();
 
+        TimeManager.GetInstance();
 
         Transport.uri = "ws://192.168.1.109:9001/ws/";
         Transport.GetInstance().Connect();
+
 
     }
 

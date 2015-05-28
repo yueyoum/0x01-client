@@ -44,31 +44,42 @@ public static class Utils
     public static Color RandomColor()
     {
         Color c;
-        switch(Random.Range(1, 3))
-        {
-            case 1:
-                c = new Color(
-                    Random.Range(0.8f, 1.0f),
-                    Random.Range(0.3f, 0.7f),
-                    Random.Range(0.3f, 0.7f)
-                    );
-                break;
-            case 2:
-                c = new Color(
-                    Random.Range(0.3f, 0.7f),
-                    Random.Range(0.8f, 1.0f),
-                    Random.Range(0.3f, 0.7f)
-                    );
-                break;
-            default:
-                c = new Color(
-                    Random.Range(0.3f, 0.7f),
-                    Random.Range(0.3f, 0.7f),
-                    Random.Range(0.8f, 1.0f)
-                    );
-                break;
-        }
+        //switch(Random.Range(1, 3))
+        //{
+        //    case 1:
+        //        c = new Color(
+        //            Random.Range(0.8f, 1.0f),
+        //            Random.Range(0.3f, 0.7f),
+        //            Random.Range(0.3f, 0.7f)
+        //            );
+        //        break;
+        //    case 2:
+        //        c = new Color(
+        //            Random.Range(0.3f, 0.7f),
+        //            Random.Range(0.8f, 1.0f),
+        //            Random.Range(0.3f, 0.7f)
+        //            );
+        //        break;
+        //    default:
+        //        c = new Color(
+        //            Random.Range(0.3f, 0.7f),
+        //            Random.Range(0.3f, 0.7f),
+        //            Random.Range(0.8f, 1.0f)
+        //            );
+        //        break;
+        //}
+
+        c = new Color(
+            Random.Range(0.5f, 0.9f),
+            Random.Range(0.5f, 0.9f),
+            Random.Range(0.5f, 0.9f)
+            );
 
         return c;
+    }
+
+    public static string FormatNowDatetime()
+    {
+        return System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff");
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class EventManger
 {
+
     private static EventManger instance = null;
 
     private EventManger()
@@ -21,7 +22,6 @@ public class EventManger
     }
 
 
-
     private void OnUnitUpdate(string id, PlayerUnit pu)
     {
         var unit = new Protocol.Define.Unit();
@@ -35,6 +35,7 @@ public class EventManger
         unit.size = pu.Script.Size;
 
         var msg = new Protocol.Define.UnitUpdate();
+        msg.milliseconds = TimeManager.GetInstance().LocalToServerTime();
         msg.units.Add(unit);
 
         var data = Protocol.ProtocolHandler.PackWithId(msg);

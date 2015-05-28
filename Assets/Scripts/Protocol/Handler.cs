@@ -9,12 +9,14 @@ namespace Protocol
     public static class ProtocolHandler
     {
         private readonly static Dictionary<Int16, Type> IdToTypeDict = new Dictionary<Int16, Type>{
-            {1, typeof(Protocol.Define.UnitAdd)},
-            {2, typeof(Protocol.Define.UnitUpdate)},
-            {3, typeof(Protocol.Define.UnitRemove)},
+            {1, typeof(Protocol.Define.TimeSync)},
+            {100, typeof(Protocol.Define.UnitAdd)},
+            {101, typeof(Protocol.Define.UnitUpdate)},
+            {102, typeof(Protocol.Define.UnitRemove)},
         };
 
         private readonly static Dictionary<Type, Action<Object>> MethodDispatcher = new Dictionary<Type,  Action<Object>>{
+            {typeof(Protocol.Define.TimeSync), o => Protocol.Implement.TimeSync.Process((Protocol.Define.TimeSync)o)},
             {typeof(Protocol.Define.UnitAdd), o => Protocol.Implement.UnitAdd.Process((Protocol.Define.UnitAdd)o)},
             {typeof(Protocol.Define.UnitUpdate), o => Protocol.Implement.UnitUpdate.Process((Protocol.Define.UnitUpdate)o)},
             {typeof(Protocol.Define.UnitRemove), o => Protocol.Implement.UnitRemove.Process((Protocol.Define.UnitRemove)o)},
@@ -74,21 +76,27 @@ namespace Protocol
         }
 
 
-        public static byte[] PackWithId(Protocol.Define.UnitAdd data)
+        public static byte[] PackWithId(Protocol.Define.TimeSync data)
         {
             return PackWithId(data, 1);
         }
             
 
+        public static byte[] PackWithId(Protocol.Define.UnitAdd data)
+        {
+            return PackWithId(data, 100);
+        }
+            
+
         public static byte[] PackWithId(Protocol.Define.UnitUpdate data)
         {
-            return PackWithId(data, 2);
+            return PackWithId(data, 101);
         }
             
 
         public static byte[] PackWithId(Protocol.Define.UnitRemove data)
         {
-            return PackWithId(data, 3);
+            return PackWithId(data, 102);
         }
             
 
