@@ -26,11 +26,14 @@ public class EventManger
     {
         var unit = new Protocol.Define.Unit();
         unit.id = id;
-        unit.pos.Add(pu.Player.transform.position.x);
-        unit.pos.Add(pu.Player.transform.position.y);
 
-        unit.move_vector.Add(pu.Script.Towards.x);
-        unit.move_vector.Add(pu.Script.Towards.y);
+        unit.pos = new Protocol.Define.Vector2();
+        unit.pos.x = pu.Player.transform.position.x;
+        unit.pos.y = pu.Player.transform.position.y;
+
+        unit.towards = new Protocol.Define.Vector2();
+        unit.towards.x = pu.Script.Towards.x;
+        unit.towards.y = pu.Script.Towards.y;
 
         unit.size = pu.Script.Size;
 

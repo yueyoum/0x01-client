@@ -71,16 +71,19 @@ public class Transport
             throw new System.Exception("No Empty Area...");
         }
 
-        Vector2 moveVector = new Vector2(0, 0);
+        Vector2 towards = new Vector2(0, 0);
         int color = Utils.ColorToInt(Utils.RandomColor());
 
         var unit = new Protocol.Define.Unit();
         unit.id = System.Guid.NewGuid().ToString();
-        unit.pos.Add(point.x);
-        unit.pos.Add(point.y);
 
-        unit.move_vector.Add(moveVector.x);
-        unit.move_vector.Add(moveVector.y);
+        unit.pos = new Protocol.Define.Vector2();
+        unit.pos.x = point.x;
+        unit.pos.y = point.y;
+
+        unit.towards = new Protocol.Define.Vector2();
+        unit.towards.x = towards.x;
+        unit.towards.y = towards.y;
 
         unit.name = "";
         unit.size = PlayerManager.InitSize;
@@ -94,7 +97,7 @@ public class Transport
             unit.size,
             color,
             point,
-            moveVector
+            towards
             );
 
         var msg = new Protocol.Define.UnitAdd();
@@ -102,7 +105,6 @@ public class Transport
 
         var data = Protocol.ProtocolHandler.PackWithId(msg);
         Send(data);
-
     }
 
     private void OnMessage(WebSocket ws, string message)

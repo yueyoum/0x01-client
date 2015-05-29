@@ -10,21 +10,17 @@ namespace Protocol.Implement
             // Logic here
             PlayerManager pm = PlayerManager.GetInstance();
 
-
-            //long x = TimeManager.GetInstance().ServerToLocalTime(msg.milliseconds) - TimeManager.GetInstance().TimestampInMilliSeconds;
-            long x = msg.milliseconds - TimeManager.GetInstance().LocalToServerTime();
-            float y = x / 1000f;
-            Debug.Log("x = " + x + ", timeSpan = " + y);
-
+            long lag = msg.milliseconds - TimeManager.GetInstance().LocalToServerTime();
+            float lagSeconds = lag / 1000f;
 
             foreach (Protocol.Define.Unit unit in msg.units)
             {
                 pm.UnitUpdate(
                     unit.id,
                     unit.size,
-                    new Vector2(unit.pos[0], unit.pos[1]),
-                    new Vector2(unit.move_vector[0], unit.move_vector[1]),
-                    -y
+                    new Vector2(unit.pos.x, unit.pos.y),
+                    new Vector2(unit.towards.x, unit.towards.y),
+                    -lagSeconds
                     );
             }
         }

@@ -17,8 +17,8 @@ namespace Protocol.Implement
                     unit.name,
                     unit.size,
                     unit.color,
-                    new Vector2(unit.pos[0], unit.pos[1]),
-                    new Vector2(unit.move_vector[0], unit.move_vector[1])
+                    new Vector2(unit.pos.x, unit.pos.y),
+                    new Vector2(unit.towards.x, unit.towards.y)
                     );
             }
         }
