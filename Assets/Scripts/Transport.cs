@@ -14,6 +14,7 @@ public class Transport
 
     private Transport()
     {
+        BestHTTP.HTTPManager.ConnectTimeout = new System.TimeSpan(0, 0, 3);
         webSocket = new WebSocket(new System.Uri(uri));
         webSocket.OnOpen += OnOpen;
         webSocket.OnMessage += OnMessage;
@@ -35,13 +36,13 @@ public class Transport
 
     public void Connect()
     {
+        webSocket.Close();
         webSocket.Open();
     }
 
     public void Send(string text)
     {
         webSocket.Send(text);
-        Debug.Log("Send: " + text);
     }
 
     public void Send(byte[] data)
@@ -52,64 +53,12 @@ public class Transport
 
     private void OnOpen(WebSocket ws)
     {
-        Debug.Log("WS OPEN");
-
-        // time sync
-        var timemsg = new Protocol.Define.TimeSync();
-        timemsg.client = TimeManager.GetInstance().TimestampInMilliSeconds;
-        timemsg.server = 0;
-
-        Send(Protocol.ProtocolHandler.PackWithId(timemsg));
-
-
-
-
-        // add self to map
-        Vector2 point;
-        if (!MapManager.GetInstance().FindEmptyArea(out point))
-        {
-            throw new System.Exception("No Empty Area...");
-        }
-
-        Vector2 towards = new Vector2(0, 0);
-        int color = Utils.ColorToInt(Utils.RandomColor());
-
-        var unit = new Protocol.Define.Unit();
-        unit.id = System.Guid.NewGuid().ToString();
-
-        unit.pos = new Protocol.Define.Vector2();
-        unit.pos.x = point.x;
-        unit.pos.y = point.y;
-
-        unit.towards = new Protocol.Define.Vector2();
-        unit.towards.x = towards.x;
-        unit.towards.y = towards.y;
-
-        unit.name = "";
-        unit.size = PlayerManager.InitSize;
-        unit.color = color;
-
-
-        PlayerManager.GetInstance().UnitAdd(
-            true,
-            unit.id,
-            unit.name,
-            unit.size,
-            color,
-            point,
-            towards
-            );
-
-        var msg = new Protocol.Define.UnitAdd();
-        msg.units.Add(unit);
-
-        var data = Protocol.ProtocolHandler.PackWithId(msg);
-        Send(data);
+        EventManger.GetInstance().TrigConnectionMade();
     }
 
     private void OnMessage(WebSocket ws, string message)
     {
-        Debug.Log("WS OnMessage: " + message);
+        throw new System.Exception("Invalid string data. Should be byte[]");
     }
 
     private void OnBinary(WebSocket ws, byte[] message)
@@ -119,14 +68,11 @@ public class Transport
 
     private void OnClose(WebSocket ws, System.UInt16 code, string reason)
     {
-        Debug.Log("WS Close");
-        Debug.Log("code = " + code);
-        Debug.Log("reason = " + reason);
+        EventManger.GetInstance().TrigConnectionLost();
     }
 
     private void OnError(WebSocket ws, System.Exception ex)
     {
-        Debug.Log("WS Error");
-        
+        EventManger.GetInstance().TrigConnectionLost();
     }
 }

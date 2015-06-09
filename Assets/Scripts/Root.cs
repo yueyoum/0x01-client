@@ -12,10 +12,16 @@ public class Root : MonoBehaviour
     public Text hs_t;
 
     public GameObject PlayerPrefab;
+    public GameObject UnitUIPrefab;
 
     void Awake()
     {
         GameManager.RootScript = this;
+
+        GlobalConfig.Unit.SizeToSpeedParam = 100f;
+        GlobalConfig.Unit.InitSize = 5f;
+        GlobalConfig.Unit.MaxSize = 5f;
+        GlobalConfig.Dot.ScoreValue = 2f;
 
         EventManger.GetInstance();
 
@@ -31,26 +37,17 @@ public class Root : MonoBehaviour
         MapManager.GridSize = 5;
         MapManager.GetInstance();
 
-        PlayerManager.InitSize = 5f;
-        PlayerManager.MaxSize = 20f;
         PlayerManager.GetInstance();
 
         TimeManager.GetInstance();
 
         Transport.uri = "ws://192.168.1.109:9001/ws/";
         Transport.GetInstance().Connect();
-
-
     }
 
     // Use this for initialization
     void Start()
     {
-        //for (int i = 0; i < 1; i++ )
-        //{
-        //    PlayerManager.GetInstance().AddMyPlayer();
-        //}
-
     }
 
     // Update is called once per frame

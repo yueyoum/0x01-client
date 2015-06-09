@@ -7,20 +7,22 @@ namespace Protocol.Implement
         public static void Process(Protocol.Define.UnitAdd msg)
         {
             // Logic here
-
             PlayerManager pm = PlayerManager.GetInstance();
-            foreach(Protocol.Define.Unit unit in msg.units)
+
+            for (int i = 0; i < msg.units.Count; i++)
             {
                 pm.UnitAdd(
                     false,
-                    unit.id,
-                    unit.name,
-                    unit.size,
-                    unit.color,
-                    new Vector2(unit.pos.x, unit.pos.y),
-                    new Vector2(unit.towards.x, unit.towards.y)
+                    msg.units[i].id,
+                    msg.units[i].name,
+                    msg.units[i].score,
+                    Utils.IntToColor(msg.units[i].color),
+                    new Vector2(msg.units[i].pos.x, msg.units[i].pos.y),
+                    new Vector2(msg.units[i].towards.x, msg.units[i].towards.y),
+                    msg.units[i].status
                     );
             }
+            Debug.Log("NetWorking: UnitAdd");
         }
     }
 }

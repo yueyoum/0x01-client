@@ -15,7 +15,7 @@ public class PlayerPool : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        CreatePlayers(10);
+        CreatePlayers(2);
     }
 
     // Update is called once per frame
@@ -31,14 +31,19 @@ public class PlayerPool : MonoBehaviour
             GameObject p = (GameObject)Instantiate(GameManager.RootScript.PlayerPrefab);
             SpriteRenderer sp = p.GetComponent<SpriteRenderer>();
 
-            float scale = PlayerManager.InitSize / sp.sprite.bounds.size.x;
+            float scale = GlobalConfig.Unit.InitSize / sp.sprite.bounds.size.x;
             p.transform.localScale = new Vector3(scale, scale, 1);
 
+            GameObject ui = (GameObject)Instantiate(GameManager.RootScript.UnitUIPrefab);
+            ui.transform.position = p.transform.position;
+            ui.SetActive(false);
+
             PlayerScript s = p.GetComponent<PlayerScript>();
+            s.InitUI(ui);
 
             p.SetActive(false);
 
-            PlayerUnit pu = new PlayerUnit(p, s);
+            PlayerUnit pu = new PlayerUnit(p, s, ui);
 
             players.Enqueue(pu);
         }
@@ -59,6 +64,7 @@ public class PlayerPool : MonoBehaviour
         PlayerUnit pu = players.Dequeue();
         pu.Player.tag = tagName;
         pu.Player.SetActive(true);
+        pu.UI.SetActive(true);
         return pu;
     }
 
@@ -66,6 +72,7 @@ public class PlayerPool : MonoBehaviour
     {
         pu.Player.tag = "";
         pu.Player.SetActive(false);
+        pu.UI.SetActive(false);
         players.Enqueue(pu);
     }
 }

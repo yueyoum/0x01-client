@@ -21,6 +21,8 @@ public class MapManager
     public static int GridSize { get; set; }
     private VectorLine line;
 
+    private Dictionary<string, GameObject> dots = new Dictionary<string, GameObject>();
+
     private static MapManager instance = null;
     private MapManager()
     {
@@ -121,7 +123,7 @@ public class MapManager
 
     public bool FindEmptyArea(out Vector2 point)
     {
-        float halfOfInitSize = PlayerManager.InitSize / 2f;
+        float halfOfInitSize = GlobalConfig.Unit.InitSize / 2f;
 
         Collider2D[] result;
 
@@ -132,7 +134,7 @@ public class MapManager
                 Random.Range(-BorderSizeY + halfOfInitSize, BorderSizeY - halfOfInitSize)
                 );
 
-            result = Physics2D.OverlapCircleAll(point, PlayerManager.InitSize);
+            result = Physics2D.OverlapCircleAll(point, GlobalConfig.Unit.InitSize);
             if (result.Length == 0)
             {
                 // this area has no players
@@ -142,6 +144,37 @@ public class MapManager
 
         point = new Vector2(0, 0);
         return false;
+    }
+
+
+
+    public void DotsAdd(string id, Vector2 pos, Color color)
+    {
+        GameObject obj = GameManager.DotPoolScript.Get();
+        obj.transform.position = pos;
+
+        DotScript ds = obj.GetComponent<DotScript>();
+        ds.Id = id;
+
+        SpriteRenderer sp = obj.GetComponent<SpriteRenderer>();
+        sp.color = color;
+
+        dots.Add(id, obj);
+    }
+
+    public void DotsRemove(string id)
+    {
+        if (!dots.ContainsKey(id))
+        {
+            return;
+        }
+
+        GameObject obj = dots[id];
+        dots.Remove(id);
+
+        GameManager.DotPoolScript.Put(obj);
+
+        Debug.Log("Dots Remove");
     }
 }
 

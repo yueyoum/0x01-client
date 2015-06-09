@@ -10,16 +10,24 @@ namespace Protocol
     {
         private readonly static Dictionary<Int16, Type> IdToTypeDict = new Dictionary<Int16, Type>{
             {1, typeof(Protocol.Define.TimeSync)},
+            {10, typeof(Protocol.Define.SceneInit)},
+            {11, typeof(Protocol.Define.SceneSync)},
             {100, typeof(Protocol.Define.UnitAdd)},
             {101, typeof(Protocol.Define.UnitUpdate)},
             {102, typeof(Protocol.Define.UnitRemove)},
+            {200, typeof(Protocol.Define.DotAdd)},
+            {201, typeof(Protocol.Define.DotRemove)},
         };
 
         private readonly static Dictionary<Type, Action<Object>> MethodDispatcher = new Dictionary<Type,  Action<Object>>{
             {typeof(Protocol.Define.TimeSync), o => Protocol.Implement.TimeSync.Process((Protocol.Define.TimeSync)o)},
+            {typeof(Protocol.Define.SceneInit), o => Protocol.Implement.SceneInit.Process((Protocol.Define.SceneInit)o)},
+            {typeof(Protocol.Define.SceneSync), o => Protocol.Implement.SceneSync.Process((Protocol.Define.SceneSync)o)},
             {typeof(Protocol.Define.UnitAdd), o => Protocol.Implement.UnitAdd.Process((Protocol.Define.UnitAdd)o)},
             {typeof(Protocol.Define.UnitUpdate), o => Protocol.Implement.UnitUpdate.Process((Protocol.Define.UnitUpdate)o)},
             {typeof(Protocol.Define.UnitRemove), o => Protocol.Implement.UnitRemove.Process((Protocol.Define.UnitRemove)o)},
+            {typeof(Protocol.Define.DotAdd), o => Protocol.Implement.DotAdd.Process((Protocol.Define.DotAdd)o)},
+            {typeof(Protocol.Define.DotRemove), o => Protocol.Implement.DotRemove.Process((Protocol.Define.DotRemove)o)},
         };
 
         public static Type GetProtocolTypeById(Int16 id)
@@ -82,6 +90,18 @@ namespace Protocol
         }
             
 
+        public static byte[] PackWithId(Protocol.Define.SceneInit data)
+        {
+            return PackWithId(data, 10);
+        }
+            
+
+        public static byte[] PackWithId(Protocol.Define.SceneSync data)
+        {
+            return PackWithId(data, 11);
+        }
+            
+
         public static byte[] PackWithId(Protocol.Define.UnitAdd data)
         {
             return PackWithId(data, 100);
@@ -97,6 +117,18 @@ namespace Protocol
         public static byte[] PackWithId(Protocol.Define.UnitRemove data)
         {
             return PackWithId(data, 102);
+        }
+            
+
+        public static byte[] PackWithId(Protocol.Define.DotAdd data)
+        {
+            return PackWithId(data, 200);
+        }
+            
+
+        public static byte[] PackWithId(Protocol.Define.DotRemove data)
+        {
+            return PackWithId(data, 201);
         }
             
 
