@@ -11,26 +11,24 @@ namespace Protocol.Implement
             MapManager mm = MapManager.GetInstance();
             PlayerManager pm = PlayerManager.GetInstance();
 
-            for (int i = 0; i < msg.dot_adds.dots.Count; i++)
+            for (int i = 0; i < msg.dot_adds.Count; i++)
             {
                 mm.DotsAdd(
-                    msg.dot_adds.dots[i].id,
-                    new Vector2(msg.dot_adds.dots[i].pos.x, msg.dot_adds.dots[i].pos.y),
-                    Utils.IntToColor(msg.dot_adds.dots[i].color)
+                    msg.dot_adds[i].id,
+                    new Vector2(msg.dot_adds[i].pos.x, msg.dot_adds[i].pos.y),
+                    Utils.IntToColor(msg.dot_adds[i].color)
                     );
             }
 
-            for (int i = 0; i < msg.unit_adds.units.Count; i++)
+            for (int i = 0; i < msg.unit_adds.Count; i++)
             {
                 pm.UnitAdd(
                     false,
-                    msg.unit_adds.units[i].id,
-                    msg.unit_adds.units[i].name,
-                    msg.unit_adds.units[i].score,
-                    Utils.IntToColor(msg.unit_adds.units[i].color),
-                    new Vector2(msg.unit_adds.units[i].pos.x, msg.unit_adds.units[i].pos.y),
-                    new Vector2(msg.unit_adds.units[i].towards.x, msg.unit_adds.units[i].towards.y),
-                    msg.unit_adds.units[i].status
+                    msg.unit_adds[i].id,
+                    msg.unit_adds[i].name,
+                    msg.unit_adds[i].size,
+                    Utils.IntToColor(msg.unit_adds[i].color),
+                    new Vector2(msg.unit_adds[i].pos.x, msg.unit_adds[i].pos.y)
                     );
             }
 

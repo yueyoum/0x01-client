@@ -32,8 +32,6 @@ public class EventManger
 
         OnSimpleTap += HandlerSimpleTap;
         OnLongTap2Finger += HandlerLongTap2Fingers;
-
-        OnUnitScoreChange += HandlerUnitScoreChange;
     }
 
     public static EventManger GetInstance()
@@ -104,102 +102,58 @@ public class EventManger
 
     private void HandlerSimpleTap(Vector3 touchPosition)
     {
-        Protocol.Define.UnitUpdate msg = new Protocol.Define.UnitUpdate();
-        msg.milliseconds = TimeManager.GetInstance().LocalToServerTime();
+        Protocol.Define.UnitMove msg = new Protocol.Define.UnitMove();
+        //msg.update_at = TimeManager.GetInstance().ServerTimeWithLag();
+        msg.update_at = TimeManager.GetInstance().ServerTime();
 
         PlayerManager pm = PlayerManager.GetInstance();
         foreach(KeyValuePair<string, PlayerUnit>pair in pm.GetMyUnits())
         {
-            if(pair.Value.Script.Status != Protocol.Define.Unit.UnitStatus.Jump)
-            {
-                pair.Value.Script.SetTarget(touchPosition);
+            Protocol.Define.UnitMove.UnitMoving unit = new Protocol.Define.UnitMove.UnitMoving();
+            unit.id = pair.Key;
+            unit.pos = new Protocol.Define.Vector2();
+            unit.pos.x = pair.Value.Player.transform.position.x;
+            unit.pos.y = pair.Value.Player.transform.position.y;
 
-                Protocol.Define.Unit unit = new Protocol.Define.Unit();
+            Vector3 direction = touchPosition - pair.Value.Player.transform.position;
+            direction.Normalize();
 
-                unit.id = pair.Key;
+            unit.direction = new Protocol.Define.Vector2();
+            unit.direction.x = direction.x;
+            unit.direction.y = direction.y;
 
-                unit.pos = new Protocol.Define.Vector2();
-                unit.pos.x = pair.Value.Player.transform.position.x;
-                unit.pos.y = pair.Value.Player.transform.position.y;
-
-                unit.towards = new Protocol.Define.Vector2();
-                unit.towards.x = pair.Value.Script.Towards.x;
-                unit.towards.y = pair.Value.Script.Towards.y;
-                unit.status = pair.Value.Script.Status;
-                unit.score = pair.Value.Script.Score;
-
-                msg.units.Add(unit);
-            }
+            msg.units.Add(unit);
         }
 
-        if (msg.units.Count > 0)
-        {
-            byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
-            Transport.GetInstance().Send(data);
-        }
+        byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
+        Transport.GetInstance().Send(data);
 
     }
 
     private void HandlerLongTap2Fingers()
     {
-        Protocol.Define.UnitUpdate msg = new Protocol.Define.UnitUpdate();
-        msg.milliseconds = TimeManager.GetInstance().LocalToServerTime();
+        Protocol.Define.UnitMove msg = new Protocol.Define.UnitMove();
+        msg.update_at = TimeManager.GetInstance().ServerTimeWithLag();
 
         PlayerManager pm = PlayerManager.GetInstance();
-        foreach(KeyValuePair<string, PlayerUnit>pair in pm.GetMyUnits())
+        foreach (KeyValuePair<string, PlayerUnit> pair in pm.GetMyUnits())
         {
-            if (pair.Value.Script.Status == Protocol.Define.Unit.UnitStatus.Move)
-            {
-                pair.Value.Script.Stop();
+            Protocol.Define.UnitMove.UnitMoving unit = new Protocol.Define.UnitMove.UnitMoving();
+            unit.id = pair.Key;
+            unit.pos = new Protocol.Define.Vector2();
+            unit.pos.x = pair.Value.Player.transform.position.x;
+            unit.pos.y = pair.Value.Player.transform.position.y;
 
-                Protocol.Define.Unit unit = new Protocol.Define.Unit();
-                unit.id = pair.Key;
-                unit.pos = new Protocol.Define.Vector2();
-                unit.pos.x = pair.Value.Player.transform.position.x;
-                unit.pos.y = pair.Value.Player.transform.position.y;
 
-                unit.towards = new Protocol.Define.Vector2();
-                unit.towards.x = 0;
-                unit.towards.y = 0;
-                unit.status = Protocol.Define.Unit.UnitStatus.Idle;
+            unit.direction = new Protocol.Define.Vector2();
+            unit.direction.x = 0;
+            unit.direction.y = 0;
 
-                unit.score = pair.Value.Script.Score;
-
-                msg.units.Add(unit);
-            }
+            msg.units.Add(unit);
         }
-
-        if (msg.units.Count > 0)
-        {
-            byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
-            Transport.GetInstance().Send(data);
-        }
-    }
-
-    private void HandlerUnitScoreChange(PlayerScript ps)
-    {
-        Debug.Log("HandlerUnitScoreChange");
-        Protocol.Define.UnitUpdate msg = new Protocol.Define.UnitUpdate();
-        msg.milliseconds = TimeManager.GetInstance().LocalToServerTime();
-
-        Protocol.Define.Unit unit = new Protocol.Define.Unit();
-        unit.id = ps.Id;
-        unit.pos = new Protocol.Define.Vector2();
-        unit.pos.x = ps.gameObject.transform.position.x;
-        unit.pos.y = ps.gameObject.transform.position.y;
-
-        unit.towards = new Protocol.Define.Vector2();
-        unit.towards.x = ps.Towards.x;
-        unit.towards.y = ps.Towards.y;
-
-        unit.status = ps.Status;
-        unit.score = ps.Score;
-
-        msg.units.Add(unit);
 
         byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
         Transport.GetInstance().Send(data);
     }
-
     # endregion
 }

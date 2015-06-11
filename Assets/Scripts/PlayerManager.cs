@@ -50,14 +50,13 @@ public class PlayerManager
     #endregion
 
 
-    public void UnitAdd(bool isOwn, string id, string name, float score, Color color, Vector2 pos, Vector2 towards, Protocol.Define.Unit.UnitStatus status)
+    public void UnitAdd(bool isOwn, string id, string name, float size, Color color, Vector2 pos)
     {
         PlayerUnit pu = GameManager.PlayerPoolScript.Get();
-        pu.Player.transform.position = pos;
+        pu.Script.InitPosition(new Vector3(pos.x, pos.y));
         pu.Script.Id = id;
-        pu.Script.Score = score;
-        pu.Script.Towards = towards;
-        pu.Script.Status = status;
+        pu.Script.Name = name;
+        pu.Script.Size = size;
 
         SpriteRenderer sp = pu.Player.GetComponent<SpriteRenderer>();
         sp.color = color;
@@ -80,15 +79,20 @@ public class PlayerManager
     }
 
     # region Called by Server Data
-    public void UnitUpdate(string id, float score, Vector2 pos, Vector2 towards, Protocol.Define.Unit.UnitStatus status, float timeSpan)
+    public void UnitUpdate(string id, float size, Vector2 pos, float lag)
     {
-        pos += towards * timeSpan;
         if (otherUnits.ContainsKey(id))
         {
-            otherUnits[id].Player.transform.position = pos;
-            otherUnits[id].Script.Towards = towards;
-            otherUnits[id].Script.Score = score;
-            otherUnits[id].Script.Status = status;
+            //pos += towards * timeSpan * otherUnits[id].Script.Speed;
+            otherUnits[id].Script.Size = size;
+            otherUnits[id].Script.Pos = new Vector3(pos.x, pos.y, 0);
+        }
+        else
+        {
+            //pos += towards * timeSpan * myUnits[id].Script.Speed;
+            myUnits[id].Script.Lag = lag;
+            myUnits[id].Script.Size = size;
+            myUnits[id].Script.Pos = new Vector3(pos.x, pos.y, 0);
         }
     }
 
@@ -129,42 +133,16 @@ public class PlayerManager
             throw new System.Exception("No Empty Area...");
         }
 
-        Vector2 towards = new Vector2(0, 0);
-        Color color = Utils.RandomColor();
-        int colorInt = Utils.ColorToInt(color);
+        Protocol.Define.UnitCreate msg = new Protocol.Define.UnitCreate();
+        msg.name = "";
+        msg.pos = new Protocol.Define.Vector2();
+        msg.pos.x = point.x;
+        msg.pos.y = point.y;
 
-        var unit = new Protocol.Define.Unit();
-        unit.id = System.Guid.NewGuid().ToString();
+        byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
 
-        unit.pos = new Protocol.Define.Vector2();
-        unit.pos.x = point.x;
-        unit.pos.y = point.y;
-
-        unit.towards = new Protocol.Define.Vector2();
-        unit.towards.x = towards.x;
-        unit.towards.y = towards.y;
-
-        unit.name = "";
-        unit.score = 0;
-        unit.color = colorInt;
-        unit.status = Protocol.Define.Unit.UnitStatus.Idle;
-
-        var msg = new Protocol.Define.UnitAdd();
-        msg.units.Add(unit);
-
-        var data = Protocol.ProtocolHandler.PackWithId(msg);
         Transport.GetInstance().Send(data);
 
-        UnitAdd(
-            true,
-            unit.id,
-            unit.name,
-            unit.score,
-            color,
-            point,
-            towards,
-            unit.status
-            );
     }
 }
 

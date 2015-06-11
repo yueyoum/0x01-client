@@ -6,90 +6,33 @@ using System.Collections;
 public class PlayerScript : MonoBehaviour
 {
     public string Id { get; set; }
-
-    private Vector3 oldTowards = new Vector3();
-    private Vector3 currentTowards = new Vector3();
-    private Vector3 realTowards = new Vector3();
-
-    private float towardsChangeTotalSeconds = 0.3f;
-    private float towardsChangeRunningSeconds = 0f;
-
-    public Vector3 Towards
-    {
-        get
-        {
-            return realTowards;
-        }
-        set
-        {
-            oldTowards = currentTowards;
-            realTowards = value;
-            towardsChangeRunningSeconds = 0f;
-        }
-    }
-
-    private float score;
-
-    private float oldSize;
-    private float currentSize;
-    private float realSize;
-    private float sizeChangeTotalSeconds = 0.5f;
-    private float sizeChangeRunningSeconds = 0f;
-
-
-    public float Score
-    {
-        get
-        {
-            return score;
-        }
-        set
-        {
-            score = value;
-            oldSize = currentSize;
-            realSize = Size;
-            sizeChangeRunningSeconds = 0f;
-            Debug.Log("Score Change");
-            Debug.Log(oldSize + ", " + realSize);
-        }
-
-    }
-
-
-    public float Size
-    {
-        get
-        {
-            if (Score == 0)
-            {
-                return GlobalConfig.Unit.InitSize;
-            }
-
-            return (float)System.Math.Log(Score, 10) * 10 + GlobalConfig.Unit.InitSize;
-        }
-    }
-
-
-
-    public float Speed
-    {
-        get
-        {
-            return GlobalConfig.Unit.SizeToSpeedParam / currentSize;
-        }
-    }
-
+    public float Size { get; set; }
     public string Name { get; set; }
-    public Protocol.Define.Unit.UnitStatus Status { get; set; }
+    public float Lag { get; set; }
+    public Vector3 Pos
+    {
+        get
+        {
+            return gameObject.transform.position;
+        }
+        set
+        {
+            realPos = value;
+            oldPos = gameObject.transform.position;
+            //posRunningTime = Lag + 0.09f;
+            posRunningTime = Lag;
+            inMove = true;
+        }
+    }
 
-    private float acc = 1f;
-    private float accStart = 0f;
-    private float accStartAt = 0f;
-    private float accParamMulti = 0f;
-    private static readonly float accCap = 50f;
 
-    private float boundSize;
-    private float scale;
+    //private float boundSize;
+    private Vector3 oldPos;
+    private Vector3 realPos;
+    private float posTotalTime = 0.2f;
+    private float posRunningTime = 0f;
+    private bool inMove = true;
+
 
     private GameObject UI;
     private RectTransform uiTransform;
@@ -97,12 +40,8 @@ public class PlayerScript : MonoBehaviour
 
     void Awake()
     {
-        oldSize = Size;
-        currentSize = oldSize;
-        realSize = oldSize;
-
-        SpriteRenderer sp = GetComponent<SpriteRenderer>();
-        boundSize = sp.sprite.bounds.size.x;
+        //SpriteRenderer sp = GetComponent<SpriteRenderer>();
+        //boundSize = sp.sprite.bounds.size.x;
     }
 
     // Use this for initialization
@@ -113,39 +52,28 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // move
-        currentTowards = Vector3.Lerp(oldTowards, realTowards, towardsChangeRunningSeconds / towardsChangeTotalSeconds);
-        towardsChangeRunningSeconds += Time.deltaTime;
-        gameObject.transform.position += currentTowards * Time.deltaTime * Speed * acc;
+
+        if(inMove)
+        {
+            if(Vector3.Distance(gameObject.transform.position, realPos) < 0.05f)
+            {
+                gameObject.transform.position = realPos;
+                posRunningTime = 0f;
+                inMove = false;
+            }
+            else
+            {
+                gameObject.transform.position = Vector3.Lerp(oldPos, realPos, posRunningTime / posTotalTime);
+                posRunningTime += Time.deltaTime;
+                //Debug.Log("position: " + gameObject.transform.position + "runningTime = " + posRunningTime);
+            }
+        }
+
+
 
         UI.transform.position = gameObject.transform.position;
-
-
-        // size
-        currentSize = Mathf.Lerp(oldSize, realSize, sizeChangeRunningSeconds / sizeChangeTotalSeconds);
-        sizeChangeRunningSeconds += Time.deltaTime;
-        if (Mathf.Abs(currentSize - realSize) > 0.1f)
-        {
-            scale = currentSize / boundSize;
-            gameObject.transform.localScale = new Vector3(scale, scale, 1);
-        }
-
-        uiTransform.sizeDelta = new Vector2(currentSize, currentSize);
-
-        uiText.text = "大小:" + System.Math.Round(currentSize, 2) + "速度:" + System.Math.Round(Speed, 2); 
-
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            float speed = Vector3.SqrMagnitude(Towards);
-            Debug.Log("Go...");
-            accStart = accCap/speed;
-            acc = accStart;
-            accStartAt = 0f;
-            accParamMulti = (acc - 1) / Mathf.Pow(0.5f, 3f);
-
-            Status = Protocol.Define.Unit.UnitStatus.Jump;
-        }
+        uiTransform.sizeDelta = new Vector2(Size, Size);
+        uiText.text = "大小:" + System.Math.Round(Size, 2); 
     }
 
     void LateUpdate()
@@ -156,24 +84,6 @@ public class PlayerScript : MonoBehaviour
         }
 
         UI.transform.position = gameObject.transform.position;
-    }
-
-
-    void FixedUpdate()
-    {
-        if (acc == 1)
-        {
-            return;
-        }
-
-        if (acc - 1 < 0.1f)
-        {
-            acc = 1;
-            return;
-        }
-
-        accStartAt += Time.fixedDeltaTime;
-        acc = accStart - Mathf.Pow(accStartAt, 3) * accParamMulti;
     }
 
 
@@ -195,35 +105,13 @@ public class PlayerScript : MonoBehaviour
 
         ui.transform.position = gameObject.transform.position;
 
-        uiTransform.sizeDelta = new Vector2(currentSize, currentSize);
-
+        uiTransform.sizeDelta = new Vector2(Size, Size);
     }
 
-
-    public void SetTarget(Vector3 target)
+    public void InitPosition(Vector3 pos)
     {
-        if (Status != Protocol.Define.Unit.UnitStatus.Jump)
-        {
-            Vector3 towards = target - gameObject.transform.position;
-            towards.Normalize();
-            Towards = towards;
-            Status = Protocol.Define.Unit.UnitStatus.Move;
-        }
-
+        gameObject.transform.position = pos;
+        Pos = pos;
     }
 
-    public void Stop()
-    {
-        if (Status == Protocol.Define.Unit.UnitStatus.Move)
-        {
-            Towards = new Vector3(0, 0, 0);
-            Status = Protocol.Define.Unit.UnitStatus.Idle;
-        }
-    }
-
-    public void AddScore(float changedValue)
-    {
-        Score += changedValue;
-        EventManger.GetInstance().TrigUnitScoreChange(this);
-    }
 }

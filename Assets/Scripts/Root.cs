@@ -41,7 +41,7 @@ public class Root : MonoBehaviour
 
         TimeManager.GetInstance();
 
-        Transport.uri = "ws://192.168.1.109:9001/ws/";
+        Transport.uri = "ws://192.168.137.1:9001/ws/";
         Transport.GetInstance().Connect();
     }
 

@@ -11,6 +11,14 @@ public class Transport
 
     public static string uri;
 
+    public bool IsOpen
+    {
+        get
+        {
+            return webSocket.IsOpen;
+        }
+    }
+
 
     private Transport()
     {

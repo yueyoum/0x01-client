@@ -8,39 +8,34 @@ namespace Protocol.Implement
         {
             // Logic here
             PlayerManager pm = PlayerManager.GetInstance();
+            MapManager mm = MapManager.GetInstance();
 
-            long lag = TimeManager.GetInstance().LocalToServerTime() - msg.unit_updates.milliseconds;
-            float lagSeconds = lag / 1000f;
 
-            for (int i = 0; i < msg.unit_updates.units.Count; i++ )
+            long serverTime = TimeManager.GetInstance().ServerTimeWithLag();
+            float lag = (serverTime - msg.update_at) / 1000f;
+
+            Debug.Log("lag = " + lag);
+
+            for (int i = 0; i < msg.unit_updates.Count; i++ )
             {
                 pm.UnitUpdate(
-                    msg.unit_updates.units[i].id,
-                    msg.unit_updates.units[i].score,
-                    new Vector2(msg.unit_updates.units[i].pos.x, msg.unit_updates.units[i].pos.y),
-                    new Vector2(msg.unit_updates.units[i].towards.x, msg.unit_updates.units[i].towards.y),
-                    msg.unit_updates.units[i].status,
-                    lagSeconds
+                    msg.unit_updates[i].id,
+                    msg.unit_updates[i].size,
+                    new Vector2(msg.unit_updates[i].pos.x, msg.unit_updates[i].pos.y),
+                    lag
                     );
             }
 
-            if (msg.dot_adds != null)
+
+            for (int i = 0; i < msg.dot_adds.Count; i++)
             {
-                for (int i = 0; i < msg.dot_adds.dots.Count; i++)
-                {
-                    Debug.Log(msg.dot_adds.dots[i].id);
-                }
+                Debug.Log(msg.dot_adds[i].id);
             }
 
-            if (msg.dot_removes != null)
+            for (int i = 0; i < msg.dot_removes.Count; i++)
             {
-                MapManager mm = MapManager.GetInstance();
-                for (int i = 0; i < msg.dot_removes.ids.Count; i++)
-                {
-                    mm.DotsRemove(msg.dot_removes.ids[i]);
-                }
+                mm.DotsRemove(msg.dot_removes[i]);
             }
-
         }
     }
 }

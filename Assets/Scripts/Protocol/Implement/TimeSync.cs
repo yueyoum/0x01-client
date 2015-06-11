@@ -7,10 +7,10 @@ namespace Protocol.Implement
         public static void Process(Protocol.Define.TimeSync msg)
         {
             // Logic here
-            int lag = (int)(TimeManager.GetInstance().TimestampInMilliSeconds - msg.client);
+            int roundTrip = (int)(TimeManager.GetInstance().TimestampInMilliSeconds - msg.client);
 
             TimeManager tm = TimeManager.GetInstance();
-            tm.ServerUTCMilliSeconds = msg.server + lag;
+            tm.SyncTime(msg.server, roundTrip);
         }
     }
 }

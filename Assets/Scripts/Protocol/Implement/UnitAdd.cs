@@ -12,14 +12,12 @@ namespace Protocol.Implement
             for (int i = 0; i < msg.units.Count; i++)
             {
                 pm.UnitAdd(
-                    false,
+                    msg.is_own,
                     msg.units[i].id,
                     msg.units[i].name,
-                    msg.units[i].score,
+                    msg.units[i].size,
                     Utils.IntToColor(msg.units[i].color),
-                    new Vector2(msg.units[i].pos.x, msg.units[i].pos.y),
-                    new Vector2(msg.units[i].towards.x, msg.units[i].towards.y),
-                    msg.units[i].status
+                    new Vector2(msg.units[i].pos.x, msg.units[i].pos.y)
                     );
             }
             Debug.Log("NetWorking: UnitAdd");

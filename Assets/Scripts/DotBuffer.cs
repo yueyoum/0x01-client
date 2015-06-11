@@ -38,11 +38,6 @@ public class DotBuffer : MonoBehaviour
                 byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
                 Transport.GetInstance().Send(data);
 
-                foreach(KeyValuePair<PlayerScript, float> pair in playerScirptAddScoreDict)
-                {
-                    pair.Key.AddScore(pair.Value);
-                }
-
                 dotIds.Clear();
                 playerScirptAddScoreDict.Clear();
             }

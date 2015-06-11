@@ -4,19 +4,13 @@ using System.Collections.Generic;
 
 public class TimeManager
 {
-    public long ServerUTCMilliSeconds
-    {
-        get
-        {
-            return serverUTCMilliSeconds;
-        }
+    private long serverUTCMilliSeconds;
+    private System.DateTime date1970;
 
-        set
-        {
-            TimeDiffWithServer = (int)(TimestampInMilliSeconds - value);
-            serverUTCMilliSeconds = value;
-        }
-    }
+    private int lag;
+    private int timeDiffWithServer;
+
+
 
     public long Timestamp
     {
@@ -36,11 +30,6 @@ public class TimeManager
         }
     }
 
-    // local time - server time
-    public int TimeDiffWithServer { get; private set; }
-
-    private long serverUTCMilliSeconds;
-    private System.DateTime date1970;
 
     private static TimeManager instance = null;
     private TimeManager()
@@ -58,14 +47,22 @@ public class TimeManager
         return instance;
     }
 
-    public long LocalToServerTime()
+
+    public void SyncTime(long serverTime, int roundTrip)
     {
-        return TimestampInMilliSeconds - TimeDiffWithServer;
+        lag = roundTrip / 2;
+        timeDiffWithServer = (int)(TimestampInMilliSeconds - serverTime - lag);
     }
 
-    public long ServerToLocalTime(long ServerTime)
+
+    public long ServerTimeWithLag()
     {
-        return ServerTime + TimeDiffWithServer;
+        return TimestampInMilliSeconds - timeDiffWithServer + lag;
+    }
+
+    public long ServerTime()
+    {
+        return TimestampInMilliSeconds - timeDiffWithServer;
     }
 
 }

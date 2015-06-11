@@ -4,25 +4,31 @@ using System.Collections;
 public class Timer : MonoBehaviour
 {
 
-    private static readonly float interval = 2f;
-    private float passedTime;
+    private static float timeSyncInterval = 1f;
+    private float timeSyncPassedTime = 0f;
 
     // Use this for initialization
     void Start()
     {
-        passedTime = 0f;
+        timeSyncPassedTime = 0f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        passedTime += Time.deltaTime;
-        if(passedTime >= interval)
+        if (Transport.GetInstance().IsOpen)
         {
-            //System.DateTime now = System.DateTime.Now;
-            //Debug.Log("INTERVAL..." + now.ToString("yyyy-MM-dd HH:mm:ss"));
-            //PlayerManager.GetInstance().Update();
-            passedTime = 0;
+            timeSyncPassedTime += Time.deltaTime;
+            if (timeSyncPassedTime >= timeSyncInterval)
+            {
+                Protocol.Define.TimeSync msg = new Protocol.Define.TimeSync();
+                msg.client = TimeManager.GetInstance().TimestampInMilliSeconds;
+                msg.server = 0;
+                Transport.GetInstance().Send(Protocol.ProtocolHandler.PackWithId(msg));
+
+                timeSyncPassedTime = 0;
+            }
         }
+
     }
 }

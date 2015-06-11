@@ -43,7 +43,7 @@ public class GlobalTouch : MonoBehaviour
 
         Vector3 touchPosition = gesture.GetTouchToWorldPoint(10);
         EventManger.GetInstance().TrigSimpleTap(touchPosition);
-        Debug.Log("On_SimpleTap");
+        //Debug.Log("On_SimpleTap");
     }
 
     void On_LongTag2Fingers(Gesture gesture)
