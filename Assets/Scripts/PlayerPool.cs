@@ -70,7 +70,7 @@ public class PlayerPool : MonoBehaviour
 
     public void Put(PlayerUnit pu)
     {
-        pu.Player.tag = "";
+        //pu.Player.tag = "";
         pu.Player.SetActive(false);
         pu.UI.SetActive(false);
         players.Enqueue(pu);

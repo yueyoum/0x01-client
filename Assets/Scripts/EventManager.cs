@@ -19,9 +19,6 @@ public class EventManger
     public delegate void OnSimpleTapHandler(Vector3 touchPosition);
     public static event OnSimpleTapHandler OnSimpleTap = null;
 
-    public delegate void OnLongTap2FingersHandler();
-    public static event OnLongTap2FingersHandler OnLongTap2Finger = null;
-
     public delegate void OnUnitScoreChangeHandler(PlayerScript ps);
     public static event OnUnitScoreChangeHandler OnUnitScoreChange = null;
 
@@ -31,7 +28,6 @@ public class EventManger
         OnConnectionLost += HandleConnectionLost;
 
         OnSimpleTap += HandlerSimpleTap;
-        OnLongTap2Finger += HandlerLongTap2Fingers;
     }
 
     public static EventManger GetInstance()
@@ -69,10 +65,6 @@ public class EventManger
         OnSimpleTap(touchPosition);
     }
 
-    public void TrigLongTap2Fingers()
-    {
-        OnLongTap2Finger();
-    }
 
     public void TrigUnitScoreChange(PlayerScript ps)
     {
@@ -103,57 +95,13 @@ public class EventManger
     private void HandlerSimpleTap(Vector3 touchPosition)
     {
         Protocol.Define.UnitMove msg = new Protocol.Define.UnitMove();
-        //msg.update_at = TimeManager.GetInstance().ServerTimeWithLag();
-        msg.update_at = TimeManager.GetInstance().ServerTime();
-
-        PlayerManager pm = PlayerManager.GetInstance();
-        foreach(KeyValuePair<string, PlayerUnit>pair in pm.GetMyUnits())
-        {
-            Protocol.Define.UnitMove.UnitMoving unit = new Protocol.Define.UnitMove.UnitMoving();
-            unit.id = pair.Key;
-            unit.pos = new Protocol.Define.Vector2();
-            unit.pos.x = pair.Value.Player.transform.position.x;
-            unit.pos.y = pair.Value.Player.transform.position.y;
-
-            Vector3 direction = touchPosition - pair.Value.Player.transform.position;
-            direction.Normalize();
-
-            unit.direction = new Protocol.Define.Vector2();
-            unit.direction.x = direction.x;
-            unit.direction.y = direction.y;
-
-            msg.units.Add(unit);
-        }
-
-        byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
-        Transport.GetInstance().Send(data);
-
-    }
-
-    private void HandlerLongTap2Fingers()
-    {
-        Protocol.Define.UnitMove msg = new Protocol.Define.UnitMove();
-        msg.update_at = TimeManager.GetInstance().ServerTimeWithLag();
-
-        PlayerManager pm = PlayerManager.GetInstance();
-        foreach (KeyValuePair<string, PlayerUnit> pair in pm.GetMyUnits())
-        {
-            Protocol.Define.UnitMove.UnitMoving unit = new Protocol.Define.UnitMove.UnitMoving();
-            unit.id = pair.Key;
-            unit.pos = new Protocol.Define.Vector2();
-            unit.pos.x = pair.Value.Player.transform.position.x;
-            unit.pos.y = pair.Value.Player.transform.position.y;
-
-
-            unit.direction = new Protocol.Define.Vector2();
-            unit.direction.x = 0;
-            unit.direction.y = 0;
-
-            msg.units.Add(unit);
-        }
+        msg.target = new Protocol.Define.Vector2();
+        msg.target.x = touchPosition.x;
+        msg.target.y = touchPosition.y;
 
         byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
         Transport.GetInstance().Send(data);
     }
+
     # endregion
 }

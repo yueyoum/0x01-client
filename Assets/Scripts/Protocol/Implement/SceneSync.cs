@@ -26,6 +26,10 @@ namespace Protocol.Implement
                     );
             }
 
+            for (int i = 0; i < msg.unit_removes.Count; i++ )
+            {
+                pm.UnitRemove(msg.unit_removes[i]);
+            }
 
             for (int i = 0; i < msg.dot_adds.Count; i++)
             {

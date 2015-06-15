@@ -3,16 +3,18 @@ using System.Collections.Generic;
 
 public static class GlobalConfig
 {
+    public static float SyncInterval { get; set; }
+
     public static class Unit
     {
-        public static float SizeToSpeedParam {get; set; }
         public static float InitSize { get; set; }
-        public static float MaxSize { get; set; }
     }
 
-    public static class Dot
+    public static class Map
     {
-        public static float ScoreValue { get; set; }
+        public static int MinX { get; set; }
+        public static int MinY { get; set; }
+        public static int MaxX { get; set; }
+        public static int MaxY { get; set; }
     }
-
 }

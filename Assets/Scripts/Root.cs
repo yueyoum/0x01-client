@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using System.Collections;
 
-using Newtonsoft.Json;
 
 public class Root : MonoBehaviour
 {
@@ -18,10 +17,7 @@ public class Root : MonoBehaviour
     {
         GameManager.RootScript = this;
 
-        GlobalConfig.Unit.SizeToSpeedParam = 100f;
         GlobalConfig.Unit.InitSize = 5f;
-        GlobalConfig.Unit.MaxSize = 5f;
-        GlobalConfig.Dot.ScoreValue = 2f;
 
         EventManger.GetInstance();
 
@@ -41,7 +37,7 @@ public class Root : MonoBehaviour
 
         TimeManager.GetInstance();
 
-        Transport.uri = "ws://192.168.137.1:9001/ws/";
+        Transport.uri = "ws://192.168.1.109:9001/ws/";
         Transport.GetInstance().Connect();
     }
 
@@ -71,5 +67,4 @@ public class Root : MonoBehaviour
     void OnApplicationQuit()
     {
     }
-
 }

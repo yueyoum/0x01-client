@@ -12,7 +12,6 @@ public class GlobalTouch : MonoBehaviour
     void OnEnable()
     {
         EasyTouch.On_SimpleTap += On_SimpleTap;
-        EasyTouch.On_LongTap2Fingers += On_LongTag2Fingers;
         EasyTouch.On_DoubleTap += On_DoubleTap;
         EasyTouch.On_PinchIn += On_PinchIn;
         EasyTouch.On_PinchOut += On_PinchOut;
@@ -21,13 +20,11 @@ public class GlobalTouch : MonoBehaviour
     void OnDisable()
     {
         EasyTouch.On_SimpleTap -= On_SimpleTap;
-        EasyTouch.On_LongTap2Fingers -= On_LongTag2Fingers;
     }
 
     void OnDestroy()
     {
         EasyTouch.On_SimpleTap -= On_SimpleTap;
-        EasyTouch.On_LongTap2Fingers -= On_LongTag2Fingers;
     }
 
     void On_SimpleTap(Gesture gesture)
@@ -46,10 +43,6 @@ public class GlobalTouch : MonoBehaviour
         //Debug.Log("On_SimpleTap");
     }
 
-    void On_LongTag2Fingers(Gesture gesture)
-    {
-        EventManger.GetInstance().TrigLongTap2Fingers();
-    }
 
     void On_DoubleTap(Gesture gesture)
     {

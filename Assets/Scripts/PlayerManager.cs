@@ -123,10 +123,7 @@ public class PlayerManager
 
     private void EventManger_OnSceneLoad()
     {
-        Debug.Log("PlayerManager: OnSceneLoad");
-
-
-        // add self to map
+        // add self to scene
         Vector2 point;
         if (!MapManager.GetInstance().FindEmptyArea(out point))
         {
@@ -140,9 +137,7 @@ public class PlayerManager
         msg.pos.y = point.y;
 
         byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
-
         Transport.GetInstance().Send(data);
-
     }
 }
 

@@ -4,7 +4,7 @@ using System.Collections;
 public class Timer : MonoBehaviour
 {
 
-    private static float timeSyncInterval = 1f;
+    private static float timeSyncInterval = 2.0f;
     private float timeSyncPassedTime = 0f;
 
     // Use this for initialization

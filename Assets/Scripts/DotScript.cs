@@ -28,8 +28,6 @@ public class DotScript : MonoBehaviour
                 // MyUnits
                 if (Vector3.Distance(transform.position, target.transform.position) <= 1f)
                 {
-                    GameManager.DotBufferScript.DotRemove(target.GetComponent<PlayerScript>(), Id);
-
                     target = null;
                     MapManager.GetInstance().DotsRemove(Id);
                 }
@@ -38,19 +36,19 @@ public class DotScript : MonoBehaviour
     }
 
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (target != null)
-        {
-            return;
-        }
+    //void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    if (target != null)
+    //    {
+    //        return;
+    //    }
 
-        if (other.gameObject.layer == 9 || other.gameObject.layer == 10)
-        {
-            // MyUnits, OtherUnits
-            target = other.gameObject;
-        }
-    }
+    //    if (other.gameObject.layer == 9 || other.gameObject.layer == 10)
+    //    {
+    //        // MyUnits, OtherUnits
+    //        target = other.gameObject;
+    //    }
+    //}
 }
 
 

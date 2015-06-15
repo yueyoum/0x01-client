@@ -16,8 +16,6 @@ namespace Protocol
             {102, typeof(Protocol.Define.UnitMove)},
             {103, typeof(Protocol.Define.UnitSplit)},
             {104, typeof(Protocol.Define.UnitEject)},
-            {105, typeof(Protocol.Define.UnitRemove)},
-            {200, typeof(Protocol.Define.DotRemove)},
             {1000, typeof(Protocol.Define.SceneInit)},
             {1001, typeof(Protocol.Define.SceneSync)},
         };
@@ -30,8 +28,6 @@ namespace Protocol
             {typeof(Protocol.Define.UnitMove), o => Protocol.Implement.UnitMove.Process((Protocol.Define.UnitMove)o)},
             {typeof(Protocol.Define.UnitSplit), o => Protocol.Implement.UnitSplit.Process((Protocol.Define.UnitSplit)o)},
             {typeof(Protocol.Define.UnitEject), o => Protocol.Implement.UnitEject.Process((Protocol.Define.UnitEject)o)},
-            {typeof(Protocol.Define.UnitRemove), o => Protocol.Implement.UnitRemove.Process((Protocol.Define.UnitRemove)o)},
-            {typeof(Protocol.Define.DotRemove), o => Protocol.Implement.DotRemove.Process((Protocol.Define.DotRemove)o)},
             {typeof(Protocol.Define.SceneInit), o => Protocol.Implement.SceneInit.Process((Protocol.Define.SceneInit)o)},
             {typeof(Protocol.Define.SceneSync), o => Protocol.Implement.SceneSync.Process((Protocol.Define.SceneSync)o)},
         };
@@ -129,18 +125,6 @@ namespace Protocol
         public static byte[] PackWithId(Protocol.Define.UnitEject data)
         {
             return PackWithId(data, 104);
-        }
-            
-
-        public static byte[] PackWithId(Protocol.Define.UnitRemove data)
-        {
-            return PackWithId(data, 105);
-        }
-            
-
-        public static byte[] PackWithId(Protocol.Define.DotRemove data)
-        {
-            return PackWithId(data, 200);
         }
             
 
