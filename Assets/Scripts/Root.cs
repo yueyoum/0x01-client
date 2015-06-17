@@ -13,32 +13,15 @@ public class Root : MonoBehaviour
     public GameObject PlayerPrefab;
     public GameObject UnitUIPrefab;
 
+    private bool hasInitialized = false;
+
     void Awake()
     {
         GameManager.RootScript = this;
 
-        GlobalConfig.Unit.InitSize = 5f;
+        BestHTTP.HTTPManager.ConnectTimeout = System.TimeSpan.FromSeconds(3);
 
-        EventManger.GetInstance();
-
-        CameraManager.CameraMain = Camera.main;
-        CameraManager.MaxSize = 40;
-        CameraManager.MinSize = 10;
-        CameraManager.InitSize = 20;
-        CameraManager.ResizeSpeed = 3;
-        CameraManager.GetInstance();
-
-        MapManager.BorderSizeY = 80;
-        MapManager.BorderSizeX = 100;
-        MapManager.GridSize = 5;
-        MapManager.GetInstance();
-
-        PlayerManager.GetInstance();
-
-        TimeManager.GetInstance();
-
-        Transport.uri = "ws://192.168.1.109:9001/ws/";
-        Transport.GetInstance().Connect();
+        GlobalConfig.GetConfig();
     }
 
     // Use this for initialization
@@ -49,6 +32,16 @@ public class Root : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!GlobalConfig.IsGetConfigDone())
+        {
+            return;
+        }
+
+        InitializeGameComponent();
+
+        Timer.GetInstance().Update();
+
+
         int sw = Screen.width;
         int sh = Screen.height;
 
@@ -66,5 +59,34 @@ public class Root : MonoBehaviour
 
     void OnApplicationQuit()
     {
+    }
+
+
+    void InitializeGameComponent()
+    {
+        if (hasInitialized)
+        {
+            return;
+        }
+
+        hasInitialized = true;
+
+        Debug.Log("Init Game Component");
+        TimeManager.GetInstance();
+        Timer.GetInstance();
+        EventManger.GetInstance();
+
+        Transport.uri = "ws://192.168.1.109:9001/ws/";
+        Transport.GetInstance().Connect();
+
+        CameraManager.CameraMain = Camera.main;
+        CameraManager.MaxSize = 40;
+        CameraManager.MinSize = 10;
+        CameraManager.InitSize = 20;
+        CameraManager.ResizeSpeed = 3;
+        CameraManager.GetInstance();
+
+        MapManager.GetInstance();
+        PlayerManager.GetInstance();
     }
 }

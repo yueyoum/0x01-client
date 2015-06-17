@@ -15,7 +15,7 @@ public class PlayerPool : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        CreatePlayers(2);
+        //CreatePlayers(2);
     }
 
     // Update is called once per frame

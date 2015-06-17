@@ -16,7 +16,7 @@ public class DotPool : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        CreateDots(50);
+        //CreateDots(50);
     }
 
     // Update is called once per frame

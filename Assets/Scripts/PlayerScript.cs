@@ -5,8 +5,6 @@ using System.Collections;
 
 public class PlayerScript : MonoBehaviour
 {
-    public string Id { get; set; }
-    public float Size { get; set; }
     public string Name { get; set; }
     public float Lag { get; set; }
     public Vector3 Pos
@@ -19,20 +17,41 @@ public class PlayerScript : MonoBehaviour
         {
             realPos = value;
             oldPos = gameObject.transform.position;
-            //posRunningTime = Lag + 0.09f;
             posRunningTime = Lag;
             inMove = true;
         }
     }
 
+    public float Size
+    {
+        get
+        {
+            return currentSize;
+        }
+        set
+        {
+            realSize = value;
+            oldSize = currentSize;
+            reSizeRunningTime = Lag;
+            inResize = true;
+        }
+    }
 
-    //private float boundSize;
+
+
+    private float boundSize;
+
+    private float oldSize;
+    private float currentSize;
+    private float realSize;
+    private float reSizeRunningTime = 0f;
+    private bool inResize = true;
+
     private Vector3 oldPos;
     private Vector3 realPos;
-    private float posTotalTime = 0.2f;
     private float posRunningTime = 0f;
     private bool inMove = true;
-
+    private float reSizeScale;
 
     private GameObject UI;
     private RectTransform uiTransform;
@@ -40,8 +59,8 @@ public class PlayerScript : MonoBehaviour
 
     void Awake()
     {
-        //SpriteRenderer sp = GetComponent<SpriteRenderer>();
-        //boundSize = sp.sprite.bounds.size.x;
+        SpriteRenderer sp = GetComponent<SpriteRenderer>();
+        boundSize = sp.sprite.bounds.size.x;
     }
 
     // Use this for initialization
@@ -63,12 +82,28 @@ public class PlayerScript : MonoBehaviour
             }
             else
             {
-                gameObject.transform.position = Vector3.Lerp(oldPos, realPos, posRunningTime / posTotalTime);
+                gameObject.transform.position = Vector3.Lerp(oldPos, realPos, posRunningTime / GlobalConfig.SyncInterval);
                 posRunningTime += Time.deltaTime;
-                //Debug.Log("position: " + gameObject.transform.position + "runningTime = " + posRunningTime);
             }
         }
 
+        if(inResize)
+        {
+            if(Mathf.Abs(currentSize - realSize) < 0.05f)
+            {
+                currentSize = realSize;
+                reSizeRunningTime = 0f;
+                inResize = false;
+            }
+            else
+            {
+                currentSize = Mathf.Lerp(oldSize, realSize, reSizeRunningTime / GlobalConfig.SyncInterval);
+                reSizeRunningTime += Time.deltaTime;
+            }
+
+            reSizeScale = currentSize / boundSize;
+            gameObject.transform.localScale = new Vector3(reSizeScale, reSizeScale, 1);
+        }
 
 
         UI.transform.position = gameObject.transform.position;
@@ -78,7 +113,7 @@ public class PlayerScript : MonoBehaviour
 
     void LateUpdate()
     {
-        if (gameObject.tag == "MyPlayerMain")
+        if (gameObject.tag == "MyUnit")
         {
             CameraManager.GetInstance().MoveMainCamera(gameObject.transform.position);
         }
@@ -86,16 +121,6 @@ public class PlayerScript : MonoBehaviour
         UI.transform.position = gameObject.transform.position;
     }
 
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        Debug.Log("Trigger: " + other.gameObject.name);
-    }
-
-    void OnTriggerStay2D(Collider2D other)
-    {
-        Debug.DrawLine(gameObject.transform.position, other.transform.position, Color.black);
-    }
 
     public void InitUI(GameObject ui)
     {
@@ -112,6 +137,12 @@ public class PlayerScript : MonoBehaviour
     {
         gameObject.transform.position = pos;
         Pos = pos;
+    }
+
+    public void InitSize(float size)
+    {
+        currentSize = size;
+        Size = size;
     }
 
 }

@@ -1,20 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Timer : MonoBehaviour
+public class Timer
 {
 
     private static float timeSyncInterval = 2.0f;
     private float timeSyncPassedTime = 0f;
 
-    // Use this for initialization
-    void Start()
+    private static Timer instance = null;
+    public static Timer GetInstance()
     {
-        timeSyncPassedTime = 0f;
+        if (instance == null)
+        {
+            instance = new Timer();
+        }
+        return instance;
     }
 
-    // Update is called once per frame
-    void Update()
+    private Timer()
+    {
+
+    }
+
+
+    public void Update()
     {
         if (Transport.GetInstance().IsOpen)
         {
@@ -29,6 +38,5 @@ public class Timer : MonoBehaviour
                 timeSyncPassedTime = 0;
             }
         }
-
     }
 }

@@ -22,7 +22,6 @@ public class Transport
 
     private Transport()
     {
-        BestHTTP.HTTPManager.ConnectTimeout = new System.TimeSpan(0, 0, 3);
         webSocket = new WebSocket(new System.Uri(uri));
         webSocket.OnOpen += OnOpen;
         webSocket.OnMessage += OnMessage;

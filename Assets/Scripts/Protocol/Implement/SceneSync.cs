@@ -14,8 +14,6 @@ namespace Protocol.Implement
             long serverTime = TimeManager.GetInstance().ServerTimeWithLag();
             float lag = (serverTime - msg.update_at) / 1000f;
 
-            Debug.Log("lag = " + lag);
-
             for (int i = 0; i < msg.unit_updates.Count; i++ )
             {
                 pm.UnitUpdate(

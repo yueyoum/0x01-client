@@ -53,10 +53,9 @@ public class PlayerManager
     public void UnitAdd(bool isOwn, string id, string name, float size, Color color, Vector2 pos)
     {
         PlayerUnit pu = GameManager.PlayerPoolScript.Get();
-        pu.Script.InitPosition(new Vector3(pos.x, pos.y));
-        pu.Script.Id = id;
+        pu.Script.InitPosition(new Vector3(pos.x, pos.y, 0));
+        pu.Script.InitSize(size);
         pu.Script.Name = name;
-        pu.Script.Size = size;
 
         SpriteRenderer sp = pu.Player.GetComponent<SpriteRenderer>();
         sp.color = color;
@@ -66,14 +65,12 @@ public class PlayerManager
         
         if (isOwn)
         {
-            pu.Player.tag = "MyPlayerMain";
-            pu.Player.layer = 9;
+            pu.Player.tag = "MyUnit";
             myUnits.Add(id, pu);
         }
         else
         {
-            pu.Player.tag = "OtherPlayer";
-            pu.Player.layer = 10;
+            pu.Player.tag = "OtherUnit";
             otherUnits.Add(id, pu);
         }
     }
@@ -83,13 +80,12 @@ public class PlayerManager
     {
         if (otherUnits.ContainsKey(id))
         {
-            //pos += towards * timeSpan * otherUnits[id].Script.Speed;
+            otherUnits[id].Script.Lag = lag;
             otherUnits[id].Script.Size = size;
             otherUnits[id].Script.Pos = new Vector3(pos.x, pos.y, 0);
         }
         else
         {
-            //pos += towards * timeSpan * myUnits[id].Script.Speed;
             myUnits[id].Script.Lag = lag;
             myUnits[id].Script.Size = size;
             myUnits[id].Script.Pos = new Vector3(pos.x, pos.y, 0);

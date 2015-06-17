@@ -6,8 +6,8 @@ using Vectrosity;
 public class MapManager
 {
     // The Map Border Axis. This Value Like The Orthographic Camera Size
-    public static float BorderSizeX { get; set; }
-    public static float BorderSizeY { get; set; }
+    public static float BorderSizeX { get; private set; }
+    public static float BorderSizeY { get; private set; }
 
     // This Values Below are the Camera viewport size
     public float XMin { get; private set; }
@@ -18,7 +18,7 @@ public class MapManager
     private float OldYMax { get; set; }
     private float OldXMax { get; set; }
 
-    public static int GridSize { get; set; }
+    private static int GridSize { get; set; }
     private VectorLine line;
 
     private Dictionary<string, GameObject> dots = new Dictionary<string, GameObject>();
@@ -26,6 +26,10 @@ public class MapManager
     private static MapManager instance = null;
     private MapManager()
     {
+        GridSize = 5;
+        BorderSizeX = GlobalConfig.Map.BoundX;
+        BorderSizeY = GlobalConfig.Map.BoundY;
+
         VectorLine.SetCamera3D(CameraManager.CameraMain);
         line = new VectorLine("grid", new Vector3[0], null, 1.0f, LineType.Discrete);
 
@@ -152,9 +156,6 @@ public class MapManager
     {
         GameObject obj = GameManager.DotPoolScript.Get();
         obj.transform.position = pos;
-
-        DotScript ds = obj.GetComponent<DotScript>();
-        ds.Id = id;
 
         SpriteRenderer sp = obj.GetComponent<SpriteRenderer>();
         sp.color = color;

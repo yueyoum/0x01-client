@@ -14,8 +14,8 @@ namespace Protocol
             {100, typeof(Protocol.Define.UnitCreate)},
             {101, typeof(Protocol.Define.UnitAdd)},
             {102, typeof(Protocol.Define.UnitMove)},
-            {103, typeof(Protocol.Define.UnitSplit)},
-            {104, typeof(Protocol.Define.UnitEject)},
+            {103, typeof(Protocol.Define.UnitSpeedUp)},
+            {104, typeof(Protocol.Define.UnitSpeedNormal)},
             {1000, typeof(Protocol.Define.SceneInit)},
             {1001, typeof(Protocol.Define.SceneSync)},
         };
@@ -26,8 +26,8 @@ namespace Protocol
             {typeof(Protocol.Define.UnitCreate), o => Protocol.Implement.UnitCreate.Process((Protocol.Define.UnitCreate)o)},
             {typeof(Protocol.Define.UnitAdd), o => Protocol.Implement.UnitAdd.Process((Protocol.Define.UnitAdd)o)},
             {typeof(Protocol.Define.UnitMove), o => Protocol.Implement.UnitMove.Process((Protocol.Define.UnitMove)o)},
-            {typeof(Protocol.Define.UnitSplit), o => Protocol.Implement.UnitSplit.Process((Protocol.Define.UnitSplit)o)},
-            {typeof(Protocol.Define.UnitEject), o => Protocol.Implement.UnitEject.Process((Protocol.Define.UnitEject)o)},
+            {typeof(Protocol.Define.UnitSpeedUp), o => Protocol.Implement.UnitSpeedUp.Process((Protocol.Define.UnitSpeedUp)o)},
+            {typeof(Protocol.Define.UnitSpeedNormal), o => Protocol.Implement.UnitSpeedNormal.Process((Protocol.Define.UnitSpeedNormal)o)},
             {typeof(Protocol.Define.SceneInit), o => Protocol.Implement.SceneInit.Process((Protocol.Define.SceneInit)o)},
             {typeof(Protocol.Define.SceneSync), o => Protocol.Implement.SceneSync.Process((Protocol.Define.SceneSync)o)},
         };
@@ -116,13 +116,13 @@ namespace Protocol
         }
             
 
-        public static byte[] PackWithId(Protocol.Define.UnitSplit data)
+        public static byte[] PackWithId(Protocol.Define.UnitSpeedUp data)
         {
             return PackWithId(data, 103);
         }
             
 
-        public static byte[] PackWithId(Protocol.Define.UnitEject data)
+        public static byte[] PackWithId(Protocol.Define.UnitSpeedNormal data)
         {
             return PackWithId(data, 104);
         }
