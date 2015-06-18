@@ -38,8 +38,8 @@ public class GlobalTouch : MonoBehaviour
 
         //req.Send();
 
-        Vector3 touchPosition = gesture.GetTouchToWorldPoint(10);
-        EventManger.GetInstance().TrigSimpleTap(touchPosition);
+        //Vector3 touchPosition = gesture.GetTouchToWorldPoint(10);
+        //EventManger.GetInstance().TrigSimpleTap(touchPosition);
         //Debug.Log("On_SimpleTap");
     }
 

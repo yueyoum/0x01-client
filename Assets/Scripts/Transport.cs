@@ -9,7 +9,7 @@ public class Transport
     private WebSocket webSocket = null;
     private static Transport instance = null;
 
-    public static string uri;
+    public static string uri = null;
 
     public bool IsOpen
     {
@@ -22,6 +22,12 @@ public class Transport
 
     private Transport()
     {
+        if(uri == null)
+        {
+            Debug.LogWarning("Transport NO URI!");
+            return;
+        }
+
         webSocket = new WebSocket(new System.Uri(uri));
         webSocket.OnOpen += OnOpen;
         webSocket.OnMessage += OnMessage;
@@ -47,13 +53,15 @@ public class Transport
         webSocket.Open();
     }
 
-    public void Send(string text)
-    {
-        webSocket.Send(text);
-    }
 
     public void Send(byte[] data)
     {
+        if(!IsOpen)
+        {
+            Debug.LogWarning("Transport NOT Open!");
+            return;
+        }
+
         webSocket.Send(data);
     }
 

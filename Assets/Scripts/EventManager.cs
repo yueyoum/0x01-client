@@ -16,18 +16,10 @@ public class EventManger
     public delegate void OnSceneLoadHandler();
     public static event OnSceneLoadHandler OnSceneLoad = null;
 
-    public delegate void OnSimpleTapHandler(Vector3 touchPosition);
-    public static event OnSimpleTapHandler OnSimpleTap = null;
-
-    public delegate void OnUnitScoreChangeHandler(PlayerScript ps);
-    public static event OnUnitScoreChangeHandler OnUnitScoreChange = null;
-
     private EventManger()
     {
         OnConnectionMade += HandleConnectionMade;
         OnConnectionLost += HandleConnectionLost;
-
-        OnSimpleTap += HandlerSimpleTap;
     }
 
     public static EventManger GetInstance()
@@ -60,17 +52,6 @@ public class EventManger
         OnSceneLoad();
     }
 
-    public void TrigSimpleTap(Vector3 touchPosition)
-    {
-        OnSimpleTap(touchPosition);
-    }
-
-
-    public void TrigUnitScoreChange(PlayerScript ps)
-    {
-        OnUnitScoreChange(ps);
-    }
-
     #endregion
 
 
@@ -90,17 +71,6 @@ public class EventManger
     private void HandleConnectionLost()
     {
         Debug.Log("Connection Lost...");
-    }
-
-    private void HandlerSimpleTap(Vector3 touchPosition)
-    {
-        Protocol.Define.UnitMove msg = new Protocol.Define.UnitMove();
-        msg.target = new Protocol.Define.Vector2();
-        msg.target.x = touchPosition.x;
-        msg.target.y = touchPosition.y;
-
-        byte[] data = Protocol.ProtocolHandler.PackWithId(msg);
-        Transport.GetInstance().Send(data);
     }
 
     # endregion
